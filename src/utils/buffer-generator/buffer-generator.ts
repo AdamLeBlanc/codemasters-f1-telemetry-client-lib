@@ -6,7 +6,7 @@ interface DynamicObject {
 
 interface StackItem {
   propertyName: string;
-  operator: (buff: Buffer, value: number, offset: number) => number;
+  operator: (buff: Buffer, value: number | string, offset: number) => number;
 }
 
 type Next<
@@ -22,7 +22,9 @@ export default class BufferCreator<T extends DynamicObject> {
     this.stack.push({
       propertyName: name,
       operator: (buff, value, currentOffset) => {
-        buff.writeUInt8(value, currentOffset);
+        if (typeof value == "number" && value >= 0 && value <= 255) {
+          buff.writeUInt8(value, currentOffset);
+        }
         return 1;
       },
     });
@@ -34,7 +36,9 @@ export default class BufferCreator<T extends DynamicObject> {
     this.stack.push({
       propertyName: name,
       operator: (buff, value, currentOffset) => {
-        buff.writeInt8(value, currentOffset);
+        if (typeof value == "number") {
+          buff.writeInt8(value, currentOffset);
+        }
         return 1;
       },
     });
@@ -46,7 +50,9 @@ export default class BufferCreator<T extends DynamicObject> {
     this.stack.push({
       propertyName: name,
       operator: (buff, value, currentOffset) => {
-        buff.writeUInt16LE(value, currentOffset);
+        if (typeof value == "number") {
+          buff.writeUInt16LE(value, currentOffset);
+        }
         return 2;
       },
     });
@@ -58,7 +64,9 @@ export default class BufferCreator<T extends DynamicObject> {
     this.stack.push({
       propertyName: name,
       operator: (buff, value, currentOffset) => {
-        buff.writeUInt16LE(value, currentOffset);
+        if (typeof value == "number") {
+          buff.writeUInt16LE(value, currentOffset);
+        }
         return 2;
       },
     });
@@ -70,7 +78,9 @@ export default class BufferCreator<T extends DynamicObject> {
     this.stack.push({
       propertyName: name,
       operator: (buff, value, currentOffset) => {
-        buff.writeFloatLE(value, currentOffset);
+        if (typeof value == "number") {
+          buff.writeFloatLE(value, currentOffset);
+        }
         return 4;
       },
     });
@@ -82,11 +92,26 @@ export default class BufferCreator<T extends DynamicObject> {
     this.stack.push({
       propertyName: name,
       operator: (buff, value, currentOffset) => {
-        buff.writeBigInt64LE(BigInt(value), currentOffset);
+        if (typeof value == "number") {
+          buff.writeBigInt64LE(BigInt(value), currentOffset);
+        }
         return 8;
       },
     });
     this.sizeInBytes += 8;
+    return this;
+  }
+
+  charArray<N extends string>(name: N, length: number): Next<T, N, number> {
+    this.stack.push({
+      operator: (buff, value, currentOffset) => {
+        if (typeof value == "string") {
+          buff.write(value, currentOffset, "ascii");
+        }
+        return length * 8;
+      },
+      propertyName: name,
+    });
     return this;
   }
 
