@@ -164,4 +164,64 @@ describe("BufferGenerator", () => {
       expect(buffer.readUInt16LE(6)).toBe(15);
     });
   });
+  describe("int16", () => {
+    test("It can process one positive number", () => {
+      const buffer = bufferCreator.int16("num").bufferFrom({ num: 898 });
+      expect(buffer.byteLength).toBe(2);
+      expect(buffer.readInt16LE()).toBe(898);
+    });
+
+    test("It can process one negative number", () => {
+      const buffer = bufferCreator.int16("num").bufferFrom({ num: -1277 });
+      expect(buffer.byteLength).toBe(2);
+      expect(buffer.readInt16LE()).toBe(-1277);
+    });
+
+    test("It can process an object with many numbers", () => {
+      const buffer = bufferCreator
+        .int16("num1")
+        .int16("num2")
+        .int16("num3")
+        .bufferFrom({ num1: 989, num2: -23, num3: 331 });
+      expect(buffer.byteLength).toBe(6);
+      expect(buffer.readInt16LE()).toBe(989);
+      expect(buffer.readInt16LE(2)).toBe(-23);
+      expect(buffer.readInt16LE(4)).toBe(331);
+    });
+
+    test("It gives 0 for numbers less than -32768", () => {
+      const buffer = bufferCreator
+        .int16("num1")
+        .int16("num2")
+        .int16("num3")
+        .int16("num4")
+        .bufferFrom({ num1: -32768, num2: -32769, num3: -123123, num4: -8 });
+
+      expect(buffer.length).toBe(8);
+      expect(buffer.readInt16LE()).toBe(-32768);
+      expect(buffer.readInt16LE(2)).toBe(0);
+      expect(buffer.readInt16LE(4)).toBe(0);
+      expect(buffer.readInt16LE(6)).toBe(-8);
+    });
+
+    test("It gives 0 for numbers greater than 32767", () => {
+      const buffer = bufferCreator
+        .int16("num1")
+        .int16("num2")
+        .int16("num3")
+        .int16("num4")
+        .bufferFrom({
+          num1: 32767,
+          num2: 32768,
+          num3: 302341230,
+          num4: 127,
+        });
+
+      expect(buffer.length).toBe(8);
+      expect(buffer.readInt16LE()).toBe(32767);
+      expect(buffer.readInt16LE(2)).toBe(0);
+      expect(buffer.readInt16LE(4)).toBe(0);
+      expect(buffer.readInt16LE(6)).toBe(127);
+    });
+  });
 });

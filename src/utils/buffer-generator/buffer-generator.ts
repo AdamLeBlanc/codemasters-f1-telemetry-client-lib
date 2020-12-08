@@ -64,8 +64,8 @@ export default class BufferCreator<T extends DynamicObject> {
     this.stack.push({
       propertyName: name,
       operator: (buff, value, currentOffset) => {
-        if (typeof value == "number") {
-          buff.writeUInt16LE(value, currentOffset);
+        if (typeof value == "number" && value >= -32768 && value <= 32767) {
+          buff.writeInt16LE(value, currentOffset);
         }
         return 2;
       },
