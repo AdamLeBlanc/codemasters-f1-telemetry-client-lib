@@ -6,6 +6,12 @@ describe("BufferGenerator", () => {
   });
 
   describe("uint8", () => {
+    test("It truncates decimal values", () => {
+      const buffer = bufferCreator.uint8("num").bufferFrom({ num: 12.2 });
+      expect(buffer.byteLength).toBe(1);
+      expect(buffer.readUInt8()).toBe(12);
+    });
+
     test("It can process one number", () => {
       const buffer = bufferCreator.uint8("num").bufferFrom({ num: 12 });
       expect(buffer.byteLength).toBe(1);
@@ -55,6 +61,11 @@ describe("BufferGenerator", () => {
     });
   });
   describe("int8", () => {
+    test("It truncates decimal valuesr", () => {
+      const buffer = bufferCreator.int8("num").bufferFrom({ num: 12.123 });
+      expect(buffer.byteLength).toBe(1);
+      expect(buffer.readInt8()).toBe(12);
+    });
     test("It can process one positive number", () => {
       const buffer = bufferCreator.int8("num").bufferFrom({ num: 12 });
       expect(buffer.byteLength).toBe(1);
@@ -110,6 +121,11 @@ describe("BufferGenerator", () => {
     });
   });
   describe("unt16", () => {
+    test("It truncates decimal values", () => {
+      const buffer = bufferCreator.uint16("num").bufferFrom({ num: 600.123 });
+      expect(buffer.byteLength).toBe(2);
+      expect(buffer.readUInt16LE()).toBe(600);
+    });
     test("It can process one positive number", () => {
       const buffer = bufferCreator.uint16("num").bufferFrom({ num: 600 });
       expect(buffer.byteLength).toBe(2);
@@ -165,6 +181,12 @@ describe("BufferGenerator", () => {
     });
   });
   describe("int16", () => {
+    test("It truncates decimal values", () => {
+      const buffer = bufferCreator.int16("num").bufferFrom({ num: 898.123 });
+      expect(buffer.byteLength).toBe(2);
+      expect(buffer.readInt16LE()).toBe(898);
+    });
+
     test("It can process one positive number", () => {
       const buffer = bufferCreator.int16("num").bufferFrom({ num: 898 });
       expect(buffer.byteLength).toBe(2);
